@@ -2,10 +2,14 @@ package com.example.yahoo_finance_api;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -37,13 +41,17 @@ public class MainActivity extends AppCompatActivity {
     String[] watchlist;
     URL[] urls;
 
+    String url;
+    WebView webView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         btnPull = findViewById(R.id.btnPull);
-        txtPulledInfo = findViewById(R.id.txtPulledInfo);
+//        txtPulledInfo = findViewById(R.id.txtPulledInfo);
+        webView =  findViewById(R.id.webView);
 
         btnPull.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -51,7 +59,12 @@ public class MainActivity extends AppCompatActivity {
                 getYahooFinance yahooFinance = new getYahooFinance();
                 yahooFinance.execute();
 
-//                txtPulledInfo.setText(Arrays.toString(watchlist));
+//                txtPulledInfo.setText(url);
+
+//                WebView myWebView = new WebView(R.layout.activity_main);
+//                ((ViewGroup)webView.getParent()).removeView(webView);
+//                setContentView(webView);
+                webView.loadUrl(url);
             }
         });
 
@@ -110,13 +123,15 @@ public class MainActivity extends AppCompatActivity {
                 String jsonData = response.body().string();
 
                 JSONObject Jobject = new JSONObject(jsonData);
-                String url = Jobject.getJSONObject("data").getJSONObject("main").getJSONArray("stream")
+                url = Jobject.getJSONObject("data").getJSONObject("main").getJSONArray("stream")
                         .getJSONObject(0).getJSONObject("content").getJSONObject("clickThroughUrl")
                         .getString("url");
-                JSONArray news = Jobject.getJSONObject("data")
-                                        .getJSONObject("main")
-                                        .getJSONArray("stream");
+//                JSONArray news = Jobject.getJSONObject("data")
+//                                        .getJSONObject("main")
+//                                        .getJSONArray("stream");
 
+//                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+//                startActivity(browserIntent);
 
                 Log.i("aydry",url);
             } catch (IOException | JSONException e) {
