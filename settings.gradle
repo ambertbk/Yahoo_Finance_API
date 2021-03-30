@@ -1,0 +1,2 @@
+include ':app'
+rootProject.name = "Yahoo_Finance_API"
