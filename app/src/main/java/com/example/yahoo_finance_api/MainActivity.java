@@ -27,13 +27,6 @@ import java.util.Arrays;
 public class MainActivity extends AppCompatActivity {
 
     Button btnPull;
-    Button btnPush;
-
-    TextView txtPulledInfo;
-    EditText edtPushInfo;
-
-    String[] watchlist;
-    URL[] urls;
 
     String url;
     WebView webView;
@@ -43,65 +36,32 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // 1. setup the views, button view to pull the news, and webview to display
         btnPull = findViewById(R.id.btnPull);
-//        txtPulledInfo = findViewById(R.id.txtPulledInfo);
         webView =  findViewById(R.id.webView);
 
+        // 2. setup the onclick listener:
+        //    when the button is clicked, execute the asynctask in background to pull the news
         btnPull.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getYahooFinance yahooFinance = new getYahooFinance();
                 yahooFinance.execute();
 
-//                txtPulledInfo.setText(url);
-
-//                WebView myWebView = new WebView(R.layout.activity_main);
-//                ((ViewGroup)webView.getParent()).removeView(webView);
-//                setContentView(webView);
                 webView.loadUrl(url);
             }
         });
 
     }
 
+    // 3. the AsyncTask that makes the API call
     private class getYahooFinance extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String[] params) {
-//            OkHttpClient client = new OkHttpClient();
-//
-//            Request request = new Request.Builder()
-//                    .url("https://apidojo-yahoo-finance-v1.p.rapidapi.com/market/get-popular-watchlists")
-//                    .get()
-//                    .addHeader("x-rapidapi-key", "f55858111fmshee3fce031d25022p19647cjsn90b05365ac87")
-//                    .addHeader("x-rapidapi-host", "apidojo-yahoo-finance-v1.p.rapidapi.com")
-//                    .build();
-//
-//            try {
-//                Response response = client.newCall(request).execute();
-//                String jsonData = response.body().string();
-//
-//                JSONObject Jobject = new JSONObject(jsonData);
-//                JSONArray watchlist_portfolios = Jobject.getJSONObject("finance")
-//                                                        .getJSONArray("result")
-//                                                        .getJSONObject(0)
-//                                                        .getJSONArray("portfolios");
-//
-//                watchlist = new String[watchlist_portfolios.length()];
-//
-//                Log.i("aydry",""+watchlist_portfolios.length());
-//
-//                for (int i = 0; i < watchlist_portfolios.length(); i++) {
-//                    watchlist[i] = watchlist_portfolios.getJSONObject(i).getString("name");
-//                }
-//
-//                Log.i("aydry", Arrays.toString(watchlist));
-//            } catch (IOException | JSONException e) {
-//                e.printStackTrace();
-//            }
-
+            // 4. setup the okhttp client to make api call
             OkHttpClient client = new OkHttpClient();
-
+            // 5. make the api call
             MediaType mediaType = MediaType.parse("text/plain");
             RequestBody body = RequestBody.create(mediaType, "Pass in the value of uuids field returned right in this endpoint to load the next page, or leave empty to load first page");
             Request request = new Request.Builder()
@@ -113,21 +73,27 @@ public class MainActivity extends AppCompatActivity {
                     .build();
 
             try {
+                // 6. get the request, and convert it to JSON object for future decomposition
                 Response response = client.newCall(request).execute();
                 String jsonData = response.body().string();
-
                 JSONObject Jobject = new JSONObject(jsonData);
-                url = Jobject.getJSONObject("data").getJSONObject("main").getJSONArray("stream")
-                        .getJSONObject(0).getJSONObject("content").getJSONObject("clickThroughUrl")
-                        .getString("url");
+
+                // 7. decompose the JSON object to find the url to news
+                url = Jobject.getJSONObject("data")
+                             .getJSONObject("main")
+                             .getJSONArray("stream")
+                             .getJSONObject(0)
+                             .getJSONObject("content")
+                             .getJSONObject("clickThroughUrl")
+                             .getString("url");
+
+                // note: the commented code below is preparation to generate the news list,
+                //       it is not used in this API research, please ignore.
 //                JSONArray news = Jobject.getJSONObject("data")
 //                                        .getJSONObject("main")
 //                                        .getJSONArray("stream");
 
-//                Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-//                startActivity(browserIntent);
-
-                Log.i("aydry",url);
+//                Log.i("aydry",url);        // for test
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
             }
